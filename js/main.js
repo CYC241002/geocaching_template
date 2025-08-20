@@ -27,10 +27,7 @@
 
     // Initialize QR Scanner
     const videoElement = document.getElementById('videoCamera');
-    let scanResult = null
     const qrScanner = new QrScanner(videoElement, (result) => {
-        if (scanResult === result.data) return; // Avoid duplicate scans
-        scanResult = result.data; // Update scan result
 
         const userId = localStorage.getItem(LOCAL_STORAGE_USER_ID_KEY)
         if (!userId) {
@@ -108,6 +105,12 @@
 
     btnCameraScan.addEventListener('click', function(e) {
         e.preventDefault() 
+        const userId = localStorage.getItem(LOCAL_STORAGE_USER_ID_KEY)
+        if (!userId) {
+            alert('請先註冊玩家！')
+            return;
+        }
+
         sectionCameraScan.classList.remove('d-none')
         sectionCheckPositionResult.classList.add('d-none')
         sectionRegisterPlayer.classList.add('d-none')
