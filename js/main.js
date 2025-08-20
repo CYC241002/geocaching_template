@@ -1,5 +1,8 @@
 (function() {
     const LOCAL_STORAGE_USER_ID_KEY = "userId"
+    const LOCAL_STORAGE_POSITION_CHECK_LIST_KEY = "positionCheckList"
+
+    // Google Apps Script網址，請點開部署頁面複製網址貼上並取代
     const APP_URL = "https://script.google.com/macros/s/AKfycby6g0ZSFYpdJSHgSN3HmlCKCxDVcgqfBquDedvb1tEO--i3NH9ThFv5awY6WOucwIdj/exec"
 
     // MainPage
@@ -11,15 +14,66 @@
     const sectionRegisterPlayer = document.getElementById('sectionRegisterPlayer')
     const sectionRegisterPlayerResult = document.getElementById('sectionRegisterPlayerResult')
     const sectionCameraScan = document.getElementById('sectionCameraScan')
+    const sectionCheckPositionResult = document.getElementById('sectionCheckPositionResult')
     const mainContent = document.getElementById('mainContent')
+
+    // Elements for Check Position Result
+    const checkPositionName = document.getElementById('checkPositionName')
+    const checkPositionDescription = document.getElementById('checkPositionDescription')
+    const checkPositionDate = document.getElementById('checkPositionDate')
 
     // Loading Overlay
     const loadingOverlay = document.getElementById('loadingOverlay')
 
     // Initialize QR Scanner
     const videoElement = document.getElementById('videoCamera');
-    const qrScanner = new QrScanner(videoElement, result => console.log('QR Code detected:', result), {
-        onDecodeError: error => console.error('QR Code decode error:', error),
+    let scanResult = null
+    const qrScanner = new QrScanner(videoElement, (result) => {
+        if (scanResult === result.data) return; // Avoid duplicate scans
+        scanResult = result.data; // Update scan result
+
+        const userId = localStorage.getItem(LOCAL_STORAGE_USER_ID_KEY)
+        if (!userId) {
+            console.error('User ID not found in local storage.');
+            return;
+        }
+
+        //停止掃瞄並送出結果
+        qrScanner.stop()
+        checkPositionName.innerText = "打卡中請稍候……"
+        checkPositionDescription.innerText = ""
+        checkPositionDate.innerText = ""
+        sectionCameraScan.classList.add('d-none')
+        sectionCheckPositionResult.classList.remove('d-none')
+
+        let body = {
+            action: 'CHECK_POSITION',
+            positionId: result.data,
+            userId: userId
+        }
+
+        fetch(APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: new URLSearchParams(body).toString()
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.result) {
+                saveArrayItemToLocalStorage(LOCAL_STORAGE_POSITION_CHECK_LIST_KEY, data.result)
+
+                checkPositionName.innerText = data.result.positionName
+                checkPositionDescription.innerText = data.result.positionDescription
+                checkPositionDate.innerText = new Date(data.result.date.trim()).toLocaleString(
+                    "zh-TW",
+                    { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timezone: 'Asia/Taipei' }
+                )
+                
+            } else {
+                console.error('Position check failed:', data.message)
+            }
+        })
+    }, {
         highlightScanRegion: true,
         highlightCodeOutline: true,
     })
@@ -55,20 +109,27 @@
     btnCameraScan.addEventListener('click', function(e) {
         e.preventDefault() 
         sectionCameraScan.classList.remove('d-none')
+        sectionCheckPositionResult.classList.add('d-none')
         sectionRegisterPlayer.classList.add('d-none')
         sectionRegisterPlayerResult.classList.add('d-none')
         mainContent.classList.add('d-none')
         loadingOverlay.classList.remove('d-none')
 
-        qrScanner.start()
-        .then(() => waitForVideoPlaying(videoElement))
+        waitForVideoPlaying(videoElement)
         .then(() => {
             loadingOverlay.classList.add('d-none')
         })
         .catch(error => {
+            console.error('Camera Error:', error);
+            loadingOverlay.classList.add('d-none')
+        })
+
+        qrScanner.start()
+        .catch(error => {
             console.error('Error starting QR Scanner:', error);
             loadingOverlay.classList.add('d-none')
         })
+        
     })
 
     btnBackToMain.forEach(btn => {
@@ -77,6 +138,7 @@
             sectionRegisterPlayer.classList.add('d-none')
             sectionRegisterPlayerResult.classList.add('d-none')
             sectionCameraScan.classList.add('d-none')
+            sectionCheckPositionResult.classList.add('d-none')
             mainContent.classList.remove('d-none')
             qrScanner.stop()
         })
@@ -148,8 +210,16 @@
                 sectionCameraScan.classList.add('d-none')
                 mainContent.classList.add('d-none')
                 registerPlayerResultMessage.innerText = data.message
-                localStorage.setItem(LOCAL_STORAGE_USER_ID_KEY, data.userId)
+                localStorage.setItem(LOCAL_STORAGE_USER_ID_KEY, data.id)
             })
         })
     })
+
+    function saveArrayItemToLocalStorage(key, value) {
+        var data = JSON.parse(localStorage.getItem(key)) || []
+        if (!data.includes(value)) {
+            data.push(value)
+            localStorage.setItem(key, JSON.stringify(data))
+        }
+    }
 })()
