@@ -270,7 +270,7 @@
             <div class="card">
                 <img src="{{featureImageUrl}}" class="card-img-top {{isFeatureImageUrlEnabled}}" alt="{{name}}">
                 <div class="card-body">
-                    <h5 class="card-title>{{name}}</h5>
+                    <h5 class="card-title">{{name}}</h5>
                     <p class="card-text">{{description}}</p>
                     <p class="card-text"><small class="text-muted">打卡時間：{{date}}</small></p>
                 </div>
@@ -292,19 +292,19 @@
             )
 
             let mapUrl = '#'
-            if (position.positionPoint && typeof position.positionPoint.lan === 'number' && typeof position.positionPoint.lon === 'number') {
-                mapUrl = `https://www.google.com/maps?q=${position.positionPoint.lan},${position.positionPoint.lon}`
+            if (position.positionPoint && typeof position.positionPoint.lat === 'number' && typeof position.positionPoint.lon === 'number') {
+                mapUrl = `https://www.google.com/maps?q=${position.positionPoint.lat},${position.positionPoint.lon}`
             }
-
+            
             const cardHtml = positionCardTemplate
                 .replace('{{featureImageUrl}}', position.featureImageUrl || '')
                 .replace('{{isFeatureImageUrlEnabled}}', position.featureImageUrl ? '' : 'd-none')
-                .replace('{{name}}', position.positionName)
+                .replace(/{{name}}/g, position.positionName)
                 .replace('{{description}}', position.positionDescription)
                 .replace('{{date}}', date)
                 .replace('{{mapUrl}}', mapUrl)
                 .replace('{{isMapUrlEnabled}}', mapUrl !== '#' ? '' : 'd-none')
-
+            
             positionList.innerHTML += cardHtml
         })
     }
