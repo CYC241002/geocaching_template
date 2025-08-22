@@ -209,9 +209,6 @@
         .catch(error => {
         console.error('Error fetching teams:', error);
         })
-        .finally(() => {
-            loadingOverlay.classList.add('d-none')
-        })
     }
     
 
@@ -251,6 +248,18 @@
                 localStorage.setItem(LOCAL_STORAGE_USER_ID_KEY, data.id)
             })
         })
+    })
+
+    fetch(APP_URL + '?action=PING', { method: 'GET' })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            console.log('Server response:', data.message)
+            loadingOverlay.classList.add('d-none')
+        }
+    })
+    .catch((e)=>{
+        console.error('Error connecting to server:', e)
     })
 
     function renderPositionList(positions, positionList) {
