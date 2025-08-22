@@ -48,6 +48,16 @@
         sectionCameraScan.classList.add('d-none')
         sectionCheckPositionResult.classList.remove('d-none')
 
+        const positionCheckList = JSON.parse(localStorage.getItem(LOCAL_STORAGE_POSITION_CHECK_LIST_KEY)) || []
+        const repeatChecking = positionCheckList.filter(position => position.postionId === result.data)
+        if (repeatChecking.length > 0) {
+            console.warn('Position already checked:', result.data);
+            checkPositionName.innerText = "已打卡過此位置！"
+            checkPositionDescription.innerText = ""
+            checkPositionDate.innerText = ""
+            return;
+        }
+
         let body = {
             action: 'CHECK_POSITION',
             positionId: result.data,
@@ -251,7 +261,7 @@
         
         positionList.innerHTML = '' // 清空列表
         if (positions.length === 0) {
-            positionList.innerHTML = '<p class="text-muted">尚未打卡紀錄</p>'
+            positionList.innerHTML = '<p class="text-muted">目前沒有打卡紀錄！</p>'
             return
         }
 
@@ -263,6 +273,9 @@
                     <h5 class="card-title>{{name}}</h5>
                     <p class="card-text">{{description}}</p>
                     <p class="card-text"><small class="text-muted">打卡時間：{{date}}</small></p>
+                </div>
+                <div class="card-footer text-muted {{isMapUrlEnabled}}">
+                    <a href="{{mapUrl}}" class="btn btn-primary" target="_blank">查看地圖</a>
                 </div>
             </div>
         </div>`
@@ -278,12 +291,19 @@
                 { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timezone: 'Asia/Taipei' }
             )
 
+            let mapUrl = '#'
+            if (position.positionPoint && typeof position.positionPoint.lan === 'number' && typeof position.positionPoint.lon === 'number') {
+                mapUrl = `https://www.google.com/maps?q=${position.positionPoint.lan},${position.positionPoint.lon}`
+            }
+
             const cardHtml = positionCardTemplate
                 .replace('{{featureImageUrl}}', position.featureImageUrl || '')
                 .replace('{{isFeatureImageUrlEnabled}}', position.featureImageUrl ? '' : 'd-none')
                 .replace('{{name}}', position.positionName)
                 .replace('{{description}}', position.positionDescription)
                 .replace('{{date}}', date)
+                .replace('{{mapUrl}}', mapUrl)
+                .replace('{{isMapUrlEnabled}}', mapUrl !== '#' ? '' : 'd-none')
 
             positionList.innerHTML += cardHtml
         })
