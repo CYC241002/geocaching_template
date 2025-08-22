@@ -255,6 +255,7 @@
             return
         }
 
+        //使用模板字串生成打卡卡片
         const positionCardTemplate = `<div class="col-12 col-md-6 col-lg-4 mb-3">
             <div class="card">
                 <img src="{{featureImageUrl}}" class="card-img-top {{isFeatureImageUrlEnabled}}" alt="{{name}}">

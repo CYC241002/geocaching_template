@@ -10,7 +10,7 @@
     <body>
         <div id="mainContent" class="container text-center">
             <h1>大地遊戲測試</h1>
-            <div class="d-grid gap-2">
+            <div class="d-grid gap-2 mt-4">
                 <a id="btnRegisterPlayer" class="btn btn-primary btn-lg" href="#">玩家註冊</a>
                 <a id="btnCameraScan" class="btn btn-primary btn-lg" href="#">讀取QR Code</a>
                 <a id="btnPositionList" class="btn btn-primary btn-lg" href="#">檢查打卡清單</a>
@@ -19,8 +19,8 @@
 
         <div id="sectionRegisterPlayer" class="d-none container text-center">
             <h2>玩家註冊</h2>
-            <form id="formRegisterPlayer">
-                <div class="text-start mt-2">
+            <form id="formRegisterPlayer" class="mt-4">
+                <div class="text-start">
                     <label for="playerName" class="form-label">玩家名稱:</label>
                     <input type="text" id="playerName" class="form-control" name="name" placeholder="請輸入名字" required>
                 </div>
@@ -36,7 +36,7 @@
         </div>
         <div id="sectionRegisterPlayerResult" class="d-none container text-center">
             <h2>註冊結果</h2>
-            <p id="registerPlayerResultMessage"></p>
+            <p id="registerPlayerResultMessage" class="mt-4"></p>
             
             <div class="d-grid mt-4">
                 <a href="#" class="btn btn-primary btnBackToMain btn-lg">返回主頁</a>
@@ -44,8 +44,11 @@
         </div>
         <div id="sectionCameraScan" class="d-none container text-center">
             <h2>讀取QR Code</h2>
-            <p>請使用相機掃描QR Code。</p>
-            <video id="videoCamera" width="400" height="400" class="d-block mx-auto"></video>
+            <div class="mt-4">
+                <p>請使用相機掃描QR Code，並將欲掃描的QR Code置放在方框內。</p>
+                <p><small>若遇相機使用權限請求，請選擇許可避免無法正常掃描。</small></p>
+            </div>
+            <video id="videoCamera" width="400" height="400" class="d-block mx-auto mt-4"></video>
             
             <div class="d-grid mt-4">
                 <a href="#" class="btn btn-primary btnBackToMain btn-lg">返回主頁</a>
@@ -64,7 +67,7 @@
         <div id="sectionMapView" class="d-none container text-center">
             <h2>檢查打卡紀錄</h2>
             <p>來看看你總共在哪些地方留下了足跡！</p>
-            <div class="container">
+            <div class="container mt-4">
                 <div id="positionList" class="row">
                     <!-- 打卡紀錄列表將在這裡動態生成 -->
                 </div>
