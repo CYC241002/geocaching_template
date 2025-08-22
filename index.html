@@ -10,43 +10,68 @@
     <body>
         <div id="mainContent" class="container text-center">
             <h1>大地遊戲測試</h1>
-            <a id="btnRegisterPlayer" class="btn btn-primary" href="#">玩家註冊</a>
-            <a id="btnCameraScan" class="btn btn-primary" href="#">讀取QR Code</a>
+            <div class="d-grid gap-2">
+                <a id="btnRegisterPlayer" class="btn btn-primary btn-lg" href="#">玩家註冊</a>
+                <a id="btnCameraScan" class="btn btn-primary btn-lg" href="#">讀取QR Code</a>
+                <a id="btnPositionList" class="btn btn-primary btn-lg" href="#">檢查打卡清單</a>
+            </div>
         </div>
 
         <div id="sectionRegisterPlayer" class="d-none container text-center">
             <h2>玩家註冊</h2>
             <form id="formRegisterPlayer">
-                <label for="playerName">玩家名稱:</label>
-                <input type="text" id="playerName" name="name" placeholder="請輸入名字" required>
-                <select id="playerTeam" name="team" required>
+                <div class="text-start mt-2">
+                    <label for="playerName" class="form-label">玩家名稱:</label>
+                    <input type="text" id="playerName" class="form-control" name="name" placeholder="請輸入名字" required>
+                </div>
+                <select id="playerTeam" class="form-select mt-2" name="team" required>
                     <option value="" disabled selected hidden>選擇隊伍</option>
                 </select>
-                <button type="submit">註冊</button>
+                <button type="submit" class="btn btn-primary btn-lg mt-2">註冊</button>
             </form>
+            
+            <div class="d-grid mt-4">
+                <a href="#" class="btn btn-primary btnBackToMain btn-lg">返回主頁</a>
+            </div>
         </div>
         <div id="sectionRegisterPlayerResult" class="d-none container text-center">
             <h2>註冊結果</h2>
             <p id="registerPlayerResultMessage"></p>
-            <a href="#" class="btn btn-primary btnBackToMain">返回主頁</a>
+            
+            <div class="d-grid mt-4">
+                <a href="#" class="btn btn-primary btnBackToMain btn-lg">返回主頁</a>
+            </div>
         </div>
         <div id="sectionCameraScan" class="d-none container text-center">
             <h2>讀取QR Code</h2>
             <p>請使用相機掃描QR Code。</p>
             <video id="videoCamera" width="400" height="400" class="d-block mx-auto"></video>
-            <a href="#" class="btn btn-primary btnBackToMain">返回主頁</a>
+            
+            <div class="d-grid mt-4">
+                <a href="#" class="btn btn-primary btnBackToMain btn-lg">返回主頁</a>
+            </div>
         </div>
         <div id="sectionCheckPositionResult" class="d-none container text-center">
                 <h2>打卡結果</h2>
                 <h3 id="checkPositionName"></h3>
                 <p id="checkPositionDescription"></p>
                 <p id="checkPositionDate"></p>
-                <a href="#" class="btn btn-primary btnBackToMain">返回主頁</a>
+                
+            <div class="d-grid mt-4">
+                <a href="#" class="btn btn-primary btnBackToMain btn-lg">返回主頁</a>
             </div>
+        </div>
         <div id="sectionMapView" class="d-none container text-center">
             <h2>檢查打卡紀錄</h2>
             <p>來看看你總共在哪些地方留下了足跡！</p>
-            <a href="#" class="btn btn-primary btnBackToMain">返回主頁</a>
+            <div class="container">
+                <div id="positionList" class="row">
+                    <!-- 打卡紀錄列表將在這裡動態生成 -->
+                </div>
+            </div>
+            <div class="d-grid mt-4">
+                <a href="#" class="btn btn-primary btnBackToMain btn-lg">返回主頁</a>
+            </div>
         </div>
 
         <div id="loadingOverlay" class="overlay">

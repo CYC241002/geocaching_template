@@ -8,6 +8,7 @@
     // MainPage
     const btnRegisterPlayer = document.getElementById('btnRegisterPlayer')
     const btnCameraScan = document.getElementById('btnCameraScan')
+    const btnPositionList = document.getElementById('btnPositionList')
     const btnBackToMain = document.querySelectorAll('.btnBackToMain')
 
     // Sections
@@ -15,12 +16,16 @@
     const sectionRegisterPlayerResult = document.getElementById('sectionRegisterPlayerResult')
     const sectionCameraScan = document.getElementById('sectionCameraScan')
     const sectionCheckPositionResult = document.getElementById('sectionCheckPositionResult')
+    const sectionMapView = document.getElementById('sectionMapView')
     const mainContent = document.getElementById('mainContent')
 
     // Elements for Check Position Result
     const checkPositionName = document.getElementById('checkPositionName')
     const checkPositionDescription = document.getElementById('checkPositionDescription')
     const checkPositionDate = document.getElementById('checkPositionDate')
+
+    // Elements for Position List
+    const positionList = document.getElementById('positionList')
 
     // Loading Overlay
     const loadingOverlay = document.getElementById('loadingOverlay')
@@ -100,6 +105,8 @@
         sectionRegisterPlayer.classList.remove('d-none')
         sectionRegisterPlayerResult.classList.add('d-none')
         sectionCameraScan.classList.add('d-none')
+        sectionCheckPositionResult.classList.add('d-none')
+        sectionMapView.classList.add('d-none')
         mainContent.classList.add('d-none')
     })
 
@@ -115,6 +122,7 @@
         sectionCheckPositionResult.classList.add('d-none')
         sectionRegisterPlayer.classList.add('d-none')
         sectionRegisterPlayerResult.classList.add('d-none')
+        sectionMapView.classList.add('d-none')
         mainContent.classList.add('d-none')
         loadingOverlay.classList.remove('d-none')
 
@@ -135,6 +143,21 @@
         
     })
 
+    btnPositionList.addEventListener('click', function(e) {
+        e.preventDefault()
+
+        sectionRegisterPlayer.classList.add('d-none')
+        sectionRegisterPlayerResult.classList.add('d-none')
+        sectionCameraScan.classList.add('d-none')
+        sectionCheckPositionResult.classList.add('d-none')
+
+        const positionCheckList = JSON.parse(localStorage.getItem(LOCAL_STORAGE_POSITION_CHECK_LIST_KEY)) || []
+        renderPositionList(positionCheckList, positionList)
+
+        sectionMapView.classList.remove('d-none')
+        mainContent.classList.add('d-none')
+    })
+
     btnBackToMain.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault()
@@ -142,6 +165,8 @@
             sectionRegisterPlayerResult.classList.add('d-none')
             sectionCameraScan.classList.add('d-none')
             sectionCheckPositionResult.classList.add('d-none')
+            sectionMapView.classList.add('d-none')
+            positionList.innerHTML = '' // 清空打卡紀錄列表
             mainContent.classList.remove('d-none')
             qrScanner.stop()
         })
@@ -217,6 +242,51 @@
             })
         })
     })
+
+    function renderPositionList(positions, positionList) {
+        if (typeof(positions) !== 'object' || !Array.isArray(positions)) {
+            console.error('Invalid positions data:', positions)
+            return
+        }
+        
+        positionList.innerHTML = '' // 清空列表
+        if (positions.length === 0) {
+            positionList.innerHTML = '<p class="text-muted">尚未打卡紀錄</p>'
+            return
+        }
+
+        const positionCardTemplate = `<div class="col-12 col-md-6 col-lg-4 mb-3">
+            <div class="card">
+                <img src="{{featureImageUrl}}" class="card-img-top {{isFeatureImageUrlEnabled}}" alt="{{name}}">
+                <div class="card-body">
+                    <h5 class="card-title>{{name}}</h5>
+                    <p class="card-text">{{description}}</p>
+                    <p class="card-text"><small class="text-muted">打卡時間：{{date}}</small></p>
+                </div>
+            </div>
+        </div>`
+
+        positions.forEach(position => {
+            if (!position.positionName || !position.positionDescription || !position.date) {
+                console.warn('Incomplete position data:', position)
+                return
+            }
+
+            const date = new Date(position.date.trim()).toLocaleString(
+                "zh-TW",
+                { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timezone: 'Asia/Taipei' }
+            )
+
+            const cardHtml = positionCardTemplate
+                .replace('{{featureImageUrl}}', position.featureImageUrl || '')
+                .replace('{{isFeatureImageUrlEnabled}}', position.featureImageUrl ? '' : 'd-none')
+                .replace('{{name}}', position.positionName)
+                .replace('{{description}}', position.positionDescription)
+                .replace('{{date}}', date)
+
+            positionList.innerHTML += cardHtml
+        })
+    }
 
     function saveArrayItemToLocalStorage(key, value) {
         var data = JSON.parse(localStorage.getItem(key)) || []
